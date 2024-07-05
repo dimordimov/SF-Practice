@@ -1,0 +1,30 @@
+<template>
+  <lightning-button
+    variant="brand"
+    label="Add Account"
+    onclick={handleShowForm}
+  >
+  </lightning-button>
+  <lightning-card>
+    <template if:true={accounts}>
+      <lightning-datatable
+        key-field="Id"
+        data={accounts}
+        columns={columns}
+        onrowaction={handleAction}
+      >
+      </lightning-datatable>
+    </template>
+    <template if:false={accounts}>
+      <p>No accounts found.</p>
+    </template>
+  </lightning-card>
+  <template if:true={showForm}>
+    <c-create-account
+      onhide={handleHideForm}
+      onsuccess={handleCreateSuccess}
+      onerror={handleCreateError}
+    >
+    </c-create-account>
+  </template>
+</template>
