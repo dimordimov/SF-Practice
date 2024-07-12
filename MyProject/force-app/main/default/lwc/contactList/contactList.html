@@ -1,0 +1,73 @@
+<template>
+  <div class="datatable-container">
+    <div class="slds-m-around_medium">
+      <lightning-combobox
+        name="filterType"
+        label="Filter By"
+        value={filterType}
+        placeholder="Select a filter type"
+        options={filterOptions}
+        onchange={handleFilterTypeChange}
+      >
+      </lightning-combobox>
+
+      <lightning-input
+        label="Filter Value"
+        value={filterValue}
+        onchange={handleFilterValueChange}
+      >
+      </lightning-input>
+
+      <lightning-combobox
+        name="sortField"
+        label="Sort By"
+        value={sortFieldDisplay}
+        placeholder="Select a sort field"
+        options={sortOptions}
+        onchange={handleSortFieldChange}
+    >
+    </lightning-combobox>
+
+    </div>
+    <lightning-card title="Contacts List">
+      <template if:true={contacts}>
+        <lightning-datatable
+          key-field="Id"
+          data={contacts}
+          columns={columns}
+          hide-checkbox-column="true"
+        >
+        </lightning-datatable>
+      </template>
+
+      <template if:true={totalPages}>
+        <div class="slds-m-top_medium">
+          <lightning-button
+            label="Previous"
+            onclick={handlePrevious}
+            disabled={firstPageDisabled}
+            class="slds-m-around_x-small"
+          >
+          </lightning-button>
+          <template for:each={pages} for:item="page">
+            <lightning-button
+              key={page}
+              label={page}
+              onclick={handlePageChange}
+              data-id={page}
+              class="slds-m-right_xx-small"
+            >
+            </lightning-button>
+          </template>
+          <lightning-button
+            label="Next"
+            onclick={handleNext}
+            disabled={lastPageDisabled}
+          >
+          </lightning-button>
+        </div>
+      </template>
+      
+    </lightning-card>
+  </div>
+</template>

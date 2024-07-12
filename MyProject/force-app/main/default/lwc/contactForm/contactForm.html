@@ -1,0 +1,52 @@
+<template>
+  <lightning-card title="Create Contact">
+    <form onsubmit={handleSubmit}>
+      <div class="slds-m-around_medium">
+        <lightning-input
+          label="First Name"
+          value={form.firstName}
+          onchange={handleInputChange}
+          type="text"
+          data-field="firstName"
+        ></lightning-input>
+        <lightning-input
+          label="Last Name"
+          value={form.lastName}
+          onchange={handleInputChange}
+          type="text"
+          data-field="lastName"
+          required
+        ></lightning-input>
+        <lightning-input
+          label="Phone"
+          value={form.phone}
+          onchange={handleInputChange}
+          type="tel"
+          data-field="phone"
+        ></lightning-input>
+        <lightning-input
+          label="Email"
+          value={form.email}
+          onchange={handleInputChange}
+          type="email"
+          data-field="email"
+        ></lightning-input>
+        <lightning-combobox
+          label="Account"
+          value={form.accountId}
+          placeholder="Select Account"
+          options={accountOptions}
+          onchange={handleAccountChange}
+        >
+        </lightning-combobox>
+        <div class="slds-m-top_x-small">
+          <lightning-button
+            label="Create Contact"
+            type="submit"
+            variant="brand"
+          ></lightning-button>
+        </div>
+      </div>
+    </form>
+  </lightning-card>
+</template>
