@@ -1,4 +1,11 @@
 .datatable-container {
-    max-height: 900px;
-    overflow-y: auto;
+  max-height: 900px;
+  overflow-y: auto;
+}
+.slds-grid.custom-grid {
+  gap: 2px;
+  margin-bottom: 6px;
+}
+.slds-grid.custom-grid > .slds-col {
+  width: 32%;
 }

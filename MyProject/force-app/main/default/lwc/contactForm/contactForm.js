@@ -1,6 +1,9 @@
 import { LightningElement, wire, track } from 'lwc';
 import getAccounts from '@salesforce/apex/AccountController.getAccounts';
 import createContact from '@salesforce/apex/ContactController.createContact';
+import CONTACT_ADDED_CHANNEL from '@salesforce/messageChannel/ContactAdded__c';
+import { createMessageContext, releaseMessageContext, publish } from 'lightning/messageService';
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 export default class ContactForm extends LightningElement {
     @track form = {
@@ -12,6 +15,8 @@ export default class ContactForm extends LightningElement {
     };
 
     accountOptions = [];
+
+    context = createMessageContext();
 
     @wire(getAccounts)
     wiredAccounts({ error, data }) {
@@ -48,10 +53,32 @@ export default class ContactForm extends LightningElement {
 
         createContact({ contactData: JSON.stringify(this.form) })
             .then(() => {
+                this.showNotification("Contact Created", "You've successfully added a new contact!", "success");
+            })
+            .then(() => {
+                publish(this.context, CONTACT_ADDED_CHANNEL, {
+                    contactCreated: true
+                });
+            })
+            .then(() => {
                 this.clearForm();
             })
             .catch(error => {
+                this.showNotification("Failed to create Contact", "Something went wrong!", "error");
                 console.error('Error creating contact', error);
             });
+    }
+
+    showNotification(title, message, variant) {
+        const evt = new ShowToastEvent({
+          title: title,
+          message: message,
+          variant: variant,
+        });
+        this.dispatchEvent(evt);
+    }
+
+    disconnectedCallback() {
+        releaseMessageContext(this.context);
     }
 }

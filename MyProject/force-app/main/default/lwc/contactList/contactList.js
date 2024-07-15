@@ -1,6 +1,9 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, wire, track } from 'lwc';
 import getContacts from '@salesforce/apex/ContactController.getContacts';
 import getContactsCount from '@salesforce/apex/ContactController.getContactsCount';
+import { subscribe, MessageContext } from 'lightning/messageService';
+import CONTACT_ADDED_CHANNEL from '@salesforce/messageChannel/ContactAdded__c';
+import { refreshApex } from '@salesforce/apex';
 
 const COLUMNS = [
     { label: 'Name', fieldName: 'name' },
@@ -14,12 +17,14 @@ const COLUMNS = [
 export default class ContactTable extends LightningElement {
     columns = COLUMNS;
     contacts;
-
+    wiredContactsResult;
+    wiredContactCountResult;
+    
     pageNumber = 1;
     pageSize = 3;
     totalRecords;
     totalPages;
-    pages = [];
+    @track pages = [];
 
     currentPageButton;
     firstPageDisabled;
@@ -51,8 +56,24 @@ export default class ContactTable extends LightningElement {
         { label: 'Is Special', value: 'IsSpecial' }
     ];
 
+    specialFilterOptions = [
+        { label: 'Yes', value: 'True' },
+        { label: 'No', value: 'False' }
+      ];
+    
+    get showFilterOptions() {
+        return this.filterType !== '';
+    }   
+
+    get isSpecialFilter() {
+        return this.filterType === 'IsSpecial';
+    } 
+
     @wire(getContacts, { pageNumber: '$pageNumber', pageSize: '$pageSize', sortField: '$sortField', sortOrder: '$sortOrder', filterType: '$filterType', filterValue: '$filterValue' })
-    wiredContacts({ error, data }) {
+    wiredContacts(result) {
+        this.wiredContactsResult = result;
+        const { error, data } = result;
+
         if (data) {
             this.contacts = JSON.parse(data);
 
@@ -69,7 +90,10 @@ export default class ContactTable extends LightningElement {
     }
 
     @wire(getContactsCount, { filterType: '$filterType', filterValue: '$filterValue' })
-    wiredContactsCount({ error, data }) {
+    wiredContactsCount(result) {
+        this.wiredContactCountResult = result;
+        const { error, data } = result;
+
         if (data >= 0) {
             this.totalRecords = data;
             const pages = Math.ceil(this.totalRecords / this.pageSize);
@@ -92,6 +116,32 @@ export default class ContactTable extends LightningElement {
         } else if (error) {
             console.error(error);
         }
+    }
+    
+    @wire(MessageContext)
+    messageContext;
+
+    connectedCallback() {
+        this.subscribeToMessageChannel();
+    }
+
+    subscribeToMessageChannel() {
+        this.subscription = subscribe(
+          this.messageContext,
+          CONTACT_ADDED_CHANNEL,
+          (message) => this.handleMessage(message)
+        );
+    }
+
+    handleMessage(message) {
+        if (message.contactCreated) {
+            this.refreshContacts();
+        }
+    }
+
+    refreshContacts() {
+        refreshApex(this.wiredContactsResult);
+        refreshApex(this.wiredContactCountResult);
     }
 
     handlePrevious() {
@@ -135,6 +185,7 @@ export default class ContactTable extends LightningElement {
 
     handleFilterTypeChange(event) {
         this.filterType = event.target.value;
+        this.filterValue = '';
     }
 
     handleFilterValueChange(event) {

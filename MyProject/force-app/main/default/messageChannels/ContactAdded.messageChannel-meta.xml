@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>ContactAdded</masterLabel>
+    <isExposed>true</isExposed>
+    <description>Message Channel for Added Contacts</description>
+     <lightningMessageFields>
+        <fieldName>contactCreated</fieldName>
+    </lightningMessageFields>
+</LightningMessageChannel>

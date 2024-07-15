@@ -1,7 +1,8 @@
 <template>
   <div class="datatable-container">
-    <div class="slds-m-around_medium">
+    <div class="slds-grid slds-wrap slds-grid_align-spread custom-grid">
       <lightning-combobox
+        class="slds-col slds-size_1-of-3"
         name="filterType"
         label="Filter By"
         value={filterType}
@@ -11,24 +12,45 @@
       >
       </lightning-combobox>
 
-      <lightning-input
-        label="Filter Value"
-        value={filterValue}
-        onchange={handleFilterValueChange}
-      >
-      </lightning-input>
+      <template if:true={showFilterOptions}>
+        <template if:true={isSpecialFilter}>
+          <lightning-combobox
+            class="slds-col slds-size_1-of-3"
+
+            name="filterValue"
+            label="Filter Value"
+            value={filterValue}
+            placeholder="Select a value"
+            options={specialFilterOptions}
+            onchange={handleFilterValueChange}
+          >
+          </lightning-combobox>
+        </template>
+        <template if:false={isSpecialFilter}>
+          <lightning-input
+            class="slds-col slds-size_1-of-3"
+        
+            label="Filter Value"
+            value={filterValue}
+            onchange={handleFilterValueChange}
+          >
+          </lightning-input>
+        </template>
+      </template>
 
       <lightning-combobox
+        class="slds-col slds-size_1-of-3"
+
         name="sortField"
         label="Sort By"
         value={sortFieldDisplay}
         placeholder="Select a sort field"
         options={sortOptions}
         onchange={handleSortFieldChange}
-    >
-    </lightning-combobox>
-
+      >
+      </lightning-combobox>
     </div>
+ 
     <lightning-card title="Contacts List">
       <template if:true={contacts}>
         <lightning-datatable
@@ -67,7 +89,6 @@
           </lightning-button>
         </div>
       </template>
-      
     </lightning-card>
   </div>
 </template>
